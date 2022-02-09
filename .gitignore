@@ -21,3 +21,4 @@ browserstack.err
 debug.log
 yalc.lock
 .yalc
+tests_output

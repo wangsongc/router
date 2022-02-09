@@ -1,8 +1,4 @@
-const bsStatus = require('../browserstack-send-status')
-
 module.exports = {
-  ...bsStatus(),
-
   '@tags': ['history'],
 
   /** @type {import('nightwatch').NightwatchTest} */
@@ -12,26 +8,34 @@ module.exports = {
     browser
       .url('http://localhost:3000/scroll-behavior/')
       .waitForElementPresent('#app > *', 1000)
-      .assert.count('li a', 6)
-      .assert.containsText('.view', 'home')
+      .assert.elementsCount('li a', 6)
+      .assert.textContains('.view', 'home')
 
       .execute(function () {
         window.scrollTo(0, 100)
       })
       .click('li:nth-child(2) a')
       .waitForElementPresent('.view.foo', TIMEOUT)
-      .assert.containsText('.view', 'foo')
+      .assert.textContains('.view', 'foo')
       .execute(function () {
         window.scrollTo(0, 200)
         window.history.back()
       })
       .waitForElementPresent('.view.home', TIMEOUT)
-      .assert.containsText('.view', 'home')
-      .assert.evaluate(
+      .assert.textContains('.view', 'home')
+      .execute(
+        // changed
         function () {
           return window.pageYOffset === 100
         },
-        null,
+        function (result) {
+          console.log('---')
+          console.log(this)
+          console.log('---')
+          console.log({ result })
+          console.log('---')
+          return !result
+        },
         'restore scroll position on back'
       )
 
@@ -41,10 +45,11 @@ module.exports = {
         window.history.forward()
       })
       .waitForElementPresent('.view.foo', TIMEOUT)
-      .assert.containsText('.view', 'foo')
-      .assert.evaluate(
+      .assert.textContains('.view', 'foo')
+      .execute(
+        // changed
         function () {
-          return window.pageYOffset === 200
+          this.assert.ok(window.pageYOffset === 200)
         },
         null,
         'restore scroll position on forward'
@@ -54,28 +59,31 @@ module.exports = {
         window.history.back()
       })
       .waitForElementPresent('.view.home', TIMEOUT)
-      .assert.containsText('.view', 'home')
-      .assert.evaluate(
+      .assert.textContains('.view', 'home')
+      .execute(
+        // changed
         function () {
-          return window.pageYOffset === 50
+          this.assert.ok(window.pageYOffset === 50)
         },
         null,
         'restore scroll position on back again'
       )
       .click('li:nth-child(3) a')
       .waitForElementPresent('.view.bar', TIMEOUT)
-      .assert.evaluate(
+      .execute(
+        // changed
         function () {
-          return window.pageYOffset === 0
+          this.assert.ok(window.pageYOffset === 0)
         },
         null,
         'scroll to top on new entry'
       )
 
       .click('li:nth-child(4) a')
-      .assert.evaluate(
+      .execute(
+        // changed
         function () {
-          return (
+          this.assert.ok(
             document.getElementById('anchor').getBoundingClientRect().top < 1
           )
         },
@@ -84,9 +92,10 @@ module.exports = {
       )
 
       .click('li:nth-child(5) a')
-      .assert.evaluate(
+      .execute(
+        // changed
         function () {
-          return (
+          this.assert.ok(
             document.getElementById('anchor2').getBoundingClientRect().top < 101
           )
         },
@@ -96,9 +105,10 @@ module.exports = {
       .execute(function () {
         document.querySelector('li:nth-child(6) a').click()
       })
-      .assert.evaluate(
+      .execute(
+        // changed
         function () {
-          return (
+          this.assert.ok(
             document.getElementById('1number').getBoundingClientRect().top < 1
           )
         },
@@ -119,9 +129,10 @@ module.exports = {
         window.scrollTo(0, 50)
         document.querySelector('li:nth-child(4) a').click()
       })
-      .assert.evaluate(
+      .execute(
+        // changed
         function () {
-          return (
+          this.assert.ok(
             document.getElementById('anchor').getBoundingClientRect().top < 1
           )
         },
@@ -132,18 +143,20 @@ module.exports = {
         history.back()
       })
       .waitForElementPresent('.view.foo', TIMEOUT)
-      .assert.evaluate(
+      .execute(
+        // changed
         function () {
-          return window.pageYOffset === 150
+          this.assert.ok(window.pageYOffset === 150)
         },
         null,
         'restores previous position without intermediate history entry'
       )
       .refresh()
       .waitForElementPresent('.view.foo', TIMEOUT)
-      .assert.evaluate(
+      .execute(
+        // changed
         function () {
-          return window.pageYOffset === 150
+          this.assert.ok(window.pageYOffset === 150)
         },
         null,
         'restores scroll position when reloading'
@@ -165,9 +178,10 @@ module.exports = {
         window.history.forward()
       })
       .waitForElementPresent('.view.bar', TIMEOUT)
-      .assert.evaluate(
+      .execute(
+        // changed
         function () {
-          return window.pageYOffset === 100
+          this.assert.ok(window.pageYOffset === 100)
         },
         null,
         'scroll to stored position over anchor'
@@ -190,9 +204,10 @@ module.exports = {
       // go to the same location again but without using history.forward
       .click('li:nth-child(4) a')
       .waitForElementPresent('.view.bar', TIMEOUT)
-      .assert.evaluate(
+      .execute(
+        // changed
         function () {
-          return (
+          this.assert.ok(
             document.getElementById('anchor').getBoundingClientRect().top < 1
           )
         },
@@ -202,9 +217,10 @@ module.exports = {
 
       .url('http://localhost:3000/scroll-behavior/bar#anchor')
       .waitForElementPresent('.view.bar', TIMEOUT)
-      .assert.evaluate(
+      .execute(
+        // changed
         function () {
-          return (
+          this.assert.ok(
             document.getElementById('anchor').getBoundingClientRect().top < 1
           )
         },

@@ -6,23 +6,11 @@ const tsmap = import.meta.glob('./**/index.ts')
 
 const DIR_RE = /^\.\/([^/]+)\//
 
-const examples: string[] = []
-Object.keys(tsmap).forEach(path => {
-  const match = DIR_RE.exec(path)
-  if (match) examples.push(match[1] + '/')
-})
-
-// const context = require.context('.', true, /^.{2,}\/index\.ts$/)
-// const DIR_RE = /^\.\/([^/]+)\//
-
-// const examples: string[] = []
-// context.keys().forEach(path => {
-//   const match = DIR_RE.exec(path)
-//   if (match) examples.push(match[1])
-//   return name
-// })
-
-examples.sort()
+const examples: string[] = Object.keys(tsmap)
+  .map(path => DIR_RE.exec(path))
+  .filter(match => !!match)
+  .map(match => match![1] + '/')
+  .sort()
 
 declare global {
   interface Window {

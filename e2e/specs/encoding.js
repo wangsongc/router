@@ -1,5 +1,3 @@
-const bsStatus = require('../browserstack-send-status')
-
 const baseURL = 'http://localhost:3000/encoding'
 
 const rawText = ' !"#$&\'()*+,/:;<=>?@[]^`{|}'
@@ -7,8 +5,6 @@ const rawText = ' !"#$&\'()*+,/:;<=>?@[]^`{|}'
 const TIMEOUT = 2000
 
 module.exports = {
-  ...bsStatus(),
-
   '@tags': ['history', 'encoding', 'browserstack'],
 
   /** @type {import('nightwatch').NightwatchTest} */
@@ -20,9 +16,9 @@ module.exports = {
 
       .click('li:nth-child(3) a')
       .assert.urlEquals(baseURL + '/documents/%E2%82%ACuro')
-      .assert.containsText('#fullPath', '/documents/%E2%82%ACuro')
-      .assert.containsText('#path', '/documents/%E2%82%ACuro')
-      .assert.containsText('#p-id', '"€uro"')
+      .assert.textContains('#fullPath', '/documents/%E2%82%ACuro')
+      .assert.textContains('#path', '/documents/%E2%82%ACuro')
+      .assert.textContains('#p-id', '"€uro"')
 
       // full encoding test
       .click('li:nth-child(8) a')
@@ -48,16 +44,16 @@ module.exports = {
     browser
       .url(baseURL + '/documents/%E2%82%ACuro')
       .waitForElementPresent('#app > *', TIMEOUT)
-      // .assert.containsText('#fullPath', '/documents/%E2%82%ACuro')
-      // .assert.containsText('#path', '/documents/%E2%82%ACuro')
-      .assert.containsText('#p-id', '"€uro"')
+      // .assert.textContains('#fullPath', '/documents/%E2%82%ACuro')
+      // .assert.textContains('#path', '/documents/%E2%82%ACuro')
+      .assert.textContains('#p-id', '"€uro"')
 
       // TODO: invalid in safari, tests on those where this is valid
       // .url(baseURL + '/unicode/€uro')
       // .waitForElementPresent('#app > *', TIMEOUT)
       // navigation to unencoded value
       // depending on the browser the value will be encoded or not
-      // .assert.containsText('#params', JSON.stringify({ id: '€uro' }, null, 2))
+      // .assert.textContains('#params', JSON.stringify({ id: '€uro' }, null, 2))
 
       .end()
   },
